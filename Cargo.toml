@@ -7,3 +7,8 @@ edition = "2021"
 
 [dependencies]
 image = "*"
+clap = { version = "*", features = ["derive"] }
+structopt = "*"
+quicli = "*"
+exitcode = "*"
+term_size = "*"

@@ -1,34 +1,56 @@
 extern crate image;
-use std::path::Path;
-use std::fs::File;
-use image::GenericImage;
+use clap;
+
+mod print;
 mod ascii;
 mod ansi;
 mod utils;
 
+use quicli::prelude::*;
 
-fn main() {
-    let img = image::open("./images/umbreon.png").unwrap();
-    let resized = img.resize(64, 64, image::imageops::FilterType::Nearest);
+use clap::Parser;
+#[derive(Parser,Default,Debug)]
+pub struct Arguments {
+    /// Input file to read
+    file: String,
+    #[clap(short, long)]
+    ascii: bool,
+    #[clap(short, long)]
+    pixels: bool,
+    #[clap(short, long)]
+    colored_ascii: bool,
+}
+
+fn main() -> CliResult {
+    let mut size: u32 = 64;
+    if let Some((w, h)) = term_size::dimensions() {
+        size = std::cmp::min(w / 2, h) as u32;
+    }
+
+    let args = Arguments::parse();
+    let img = image::open(&args.file)?;
+
+    let resized = img.resize(size, size, image::imageops::FilterType::Nearest);
     // println!("dimensions {:?}", resized.dimensions());
 
-    let lum = resized.to_luma();
     
     // let mut fout = File::create(&Path::new("./images/madeline.png")).unwrap();
     // let _ = resized.save(&mut fout, image::PNG);
 
-    for y in 0..resized.dimensions().1 {
-        for x in 0..resized.dimensions().0 {
-            let pixel = resized.get_pixel(x, y);
-            let luma_pixel = lum.get_pixel(x,y);
-
-            if pixel[3] == 0 {
-                print!{"  "};
-            } else {
-                print!("{}{}", ansi::from_rbg(pixel[0], pixel[1], pixel[2]), ascii::get_char_from_pixels(pixel, *luma_pixel));
-                //print!("{}", ascii::get_char_from_pixels(pixel, *luma_pixel));
-            }
-        }
-        print!("\n");
+    if (args.pixels && args.ascii) || (args.pixels && args.colored_ascii) || (args.ascii && args.colored_ascii) {
+        print!("\x1b[31Invalid Arguments");
+        std::process::exit(exitcode::USAGE);
     }
+
+    if args.pixels {
+        print::filled_rgb(resized);
+    } else if args.ascii {
+        print::ascii_luma(resized);
+    } else if args.colored_ascii {
+        print::ascii_colored(resized);
+    } else {
+        print::filled_rgb(resized);
+    }
+
+    Ok(())
 }
