@@ -43,13 +43,13 @@ fn main() -> CliResult {
     }
 
     if args.pixels {
-        print::filled_rgb(resized);
+        print::filled_rgb(&resized);
     } else if args.ascii {
-        print::ascii_luma(resized);
+        print::ascii_luma(&resized);
     } else if args.colored_ascii {
-        print::ascii_colored(resized);
+        print::ascii_colored(&resized);
     } else {
-        print::filled_rgb(resized);
+        print::filled_rgb(&resized);
     }
 
     Ok(())

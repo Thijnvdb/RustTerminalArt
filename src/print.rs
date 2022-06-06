@@ -1,10 +1,10 @@
 use crate::ascii::get_char_from_luma;
 use crate::ansi::from_rbg;
-use image::GenericImage;
+use crate::image::GenericImageView;
 use image::DynamicImage;
 
-pub fn ascii_luma(img: DynamicImage) {
-    let lum = img.to_luma();
+pub fn ascii_luma(img: &DynamicImage) {
+    let lum = img.as_luma8().unwrap();
 
     for y in 0..img.dimensions().1 {
         for x in 0..img.dimensions().0 {
@@ -16,8 +16,8 @@ pub fn ascii_luma(img: DynamicImage) {
     }
 }
 
-pub fn ascii_colored(img: DynamicImage) {
-    let lum = img.to_luma();
+pub fn ascii_colored(img: &DynamicImage) {
+    let lum = img.as_luma8().unwrap();
 
     for y in 0..img.dimensions().1 {
         for x in 0..img.dimensions().0 {
@@ -31,7 +31,7 @@ pub fn ascii_colored(img: DynamicImage) {
     }
 }
 
-pub fn filled_rgb(img: DynamicImage) {
+pub fn filled_rgb(img: &DynamicImage) {
     for y in 0..img.dimensions().1 {
         for x in 0..img.dimensions().0 {
             let pixel = img.get_pixel(x, y);
