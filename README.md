@@ -1,7 +1,7 @@
 # Terminal art from image generator
 Generate terminal art from image.
 
-NOTE: color support is currently limited to terminal emulators supporting Truecolor 
+NOTE: color support is currently limited to terminal emulators supporting Truecolor or ansi256
 
 ```
 termart 0.2.0
