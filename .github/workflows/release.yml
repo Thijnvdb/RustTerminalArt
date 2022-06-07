@@ -13,7 +13,8 @@ jobs:
       - uses: taiki-e/create-gh-release-action@v1
         with:
           # (optional) Path to changelog.
-          changelog: CHANGELOG.md
+          # changelog: CHANGELOG.md
+          branch: main
         env:
           # (required) GitHub token for creating GitHub Releases.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,7 +26,7 @@ jobs:
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required) Binary name (non-extension portion of filename) to build and upload.
-          bin: ...
+          bin: termart
         env:
           # (required) GitHub token for uploading assets to GitHub Releases.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
