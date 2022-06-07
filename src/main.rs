@@ -3,22 +3,37 @@ use clap;
 
 mod print;
 mod ascii;
-mod ansi;
+mod color;
 mod utils;
 
 use quicli::prelude::*;
 
-use clap::Parser;
-#[derive(Parser,Default,Debug)]
+use clap::{Parser, ArgEnum};
+
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
 pub struct Arguments {
     /// Input file to read
     file: String,
-    #[clap(short, long)]
-    ascii: bool,
-    #[clap(short, long)]
-    pixels: bool,
-    #[clap(short, long)]
-    colored_ascii: bool,
+    // Style to use
+    #[clap(short, long, arg_enum)]
+    style: Option<Style>,
+    // Color format to use
+    #[clap(short, long, arg_enum)]
+    color_format: Option<ColorFormat>
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ArgEnum)]
+enum Style {
+    Ascii,
+    AsciiColored,
+    Pixels
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ArgEnum)]
+enum ColorFormat {
+    Truecolor,
+    Ansi256
 }
 
 fn main() -> CliResult {
@@ -31,25 +46,25 @@ fn main() -> CliResult {
     let img = image::open(&args.file)?;
 
     let resized = img.resize(size, size, image::imageops::FilterType::Nearest);
-    // println!("dimensions {:?}", resized.dimensions());
 
-    
-    // let mut fout = File::create(&Path::new("./images/madeline.png")).unwrap();
-    // let _ = resized.save(&mut fout, image::PNG);
+    let style = if let Some(s) = args.style {s} else {Style::Pixels};
+    let color_format = if let Some(f) = args.color_format {f} else {ColorFormat::Truecolor};
 
-    if (args.pixels && args.ascii) || (args.pixels && args.colored_ascii) || (args.ascii && args.colored_ascii) {
-        print!("\x1b[31Invalid Arguments");
-        std::process::exit(exitcode::USAGE);
-    }
+    let color_fun: &dyn Fn(u8, u8, u8) -> String = match color_format{
+        ColorFormat::Ansi256 => &color::ansi256,
+        ColorFormat::Truecolor => &color::truecolor
+    };
 
-    if args.pixels {
-        print::filled_rgb(&resized);
-    } else if args.ascii {
-        print::ascii_luma(&resized);
-    } else if args.colored_ascii {
-        print::ascii_colored(&resized);
-    } else {
-        print::filled_rgb(&resized);
+    match style {
+        Style::Ascii => {
+            print::ascii_luma(&resized);
+        }
+        Style::AsciiColored => {
+            print::ascii_colored(&resized, color_fun);
+        }
+        Style::Pixels => {
+            print::filled_rgb(&resized, color_fun);
+        }
     }
 
     Ok(())
