@@ -1,10 +1,10 @@
 name: Release
+
 on:
-  workflow_run:
-    workflows: ["BuildAndTest"]
+  push:
     branches: [main]
-    types: 
-      - completed
+    tags:
+      - v[0-9]+.*
 
 jobs:
   create-release:
@@ -12,9 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: taiki-e/create-gh-release-action@v1
-        # with:
-        #   # (optional) Path to changelog.
-        #   changelog: CHANGELOG.md
+        with:
+          # (optional) Path to changelog.
+          changelog: CHANGELOG.md
         env:
           # (required) GitHub token for creating GitHub Releases.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -26,7 +26,7 @@ jobs:
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required) Binary name (non-extension portion of filename) to build and upload.
-          bin: termart
+          bin: ...
         env:
           # (required) GitHub token for uploading assets to GitHub Releases.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
