@@ -1,15 +1,15 @@
 [package]
 name = "termart"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-image = "*"
-clap = { version = "*", features = ["derive"] }
-structopt = "*"
-quicli = "*"
-exitcode = "*"
-term_size = "*"
-rgb2ansi256 = "*"
+clap = { version = "4.4.3", features = ["derive"] }
+exitcode = "1.1.2"
+image = "0.24.7"
+quicli = "0.4.0"
+rgb2ansi256 = "0.1.1"
+structopt = "0.3.26"
+term_size = "0.3.2"
